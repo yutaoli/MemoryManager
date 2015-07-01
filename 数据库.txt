@@ -2,10 +2,15 @@ create database memorymanager;
 show databases;
 use memorymanager;
 
-#建“书-人”表
+/*
+建“书-人”表
+*/
 create table book_review(person_id int, book_id int, book_name varchar(100), status int, last_review int, times_reviewed int, left_days_next_review int,
 note text, reserv1 blob, reserv2 blob, reserv3 blob, reserv4 blob, reserv5 blob
 );
 alter table book_review add primary key(person_id, book_id);
+/*
+删除不需要的列
+*/
 alter table book_review drop book_name;
 alter table book_review  drop status;

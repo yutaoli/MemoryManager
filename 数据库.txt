@@ -14,3 +14,37 @@ alter table book_review add primary key(person_id, book_id);
 */
 alter table book_review drop book_name;
 alter table book_review  drop status;
+/*
+添加列
+*/
+alter table book_review add column version int;
+/*
+修改列
+*/
+ alter table book_review modify person_id int unsigned ;
+ alter table book_review modify book_id int unsigned ;
+/*
+修改表名
+*/
+alter table book_review rename to table_book_review;
+
+
+/*
+建“书”表
+*/
+create table book(book_id int, book_name varchar(50), book_desc varchar(1
+00), detail text, author varchar(100), pic_url varchar(200), video_url varchar(2
+00), reserv1 blob, reserv2 blob, reserv3 blob, reserv4 blob, reserv5 blob, versi
+on int);
+alter table book add primary key(book_id);
+alter table book modify book_name varchar(50) not null;
+alter table book modify book_id int unsigned auto_increment;
+alter table book rename to table_book;
+
+/*
+建“用户”表
+*/
+create table table_user(user_id int unsigned primary key auto_increment,
+name int,sexual char(1) not null, age smallint not null check(age>0), version sm
+allint default 1, reserv1 blob, reserv2 blob, reserv3 blob, reserv4 blob, reserv
+5 blob);

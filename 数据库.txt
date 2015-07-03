@@ -3,7 +3,7 @@ show databases;
 use memorymanager;
 
 /*
-建“书-人”表
+建“书-用户”表
 */
 create table book_review(person_id int, book_id int, book_name varchar(100), status int, last_review int, times_reviewed int, left_days_next_review int,
 note text, reserv1 blob, reserv2 blob, reserv3 blob, reserv4 blob, reserv5 blob
@@ -27,7 +27,17 @@ alter table book_review add column version int;
 修改表名
 */
 alter table book_review rename to table_book_review;
-
+/*
+修改列名
+*/
+alter table table_book_review change person_id user_id int unsigned;
+/*
+增加foreign key约束
+*/
+alter table table_book_review add foreign key(user_id) references table_u
+ser(user_id);
+alter table table_book_review add foreign key(book_id) references table_b
+ook(book_id);
 
 /*
 建“书”表
@@ -48,3 +58,16 @@ create table table_user(user_id int unsigned primary key auto_increment,
 name int,sexual char(1) not null, age smallint not null check(age>0), version sm
 allint default 1, reserv1 blob, reserv2 blob, reserv3 blob, reserv4 blob, reserv
 5 blob);
+alter table table_user modify name varchar(50);
+
+
+
+
+/*
+“书”表，插入数据
+*/
+insert into table_book(book_name, book_desc, author, pic_url, video_url,
+version) values("steve jobs", "The phenomenal bestseller about Apple co-founder
+Steve Jobs .", "Walter Isaacson", "http://image.baidu.com/search/det", "http://w
+ww.iqiyi.com/w_19rr9khrpt.html", 1);
+

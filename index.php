@@ -41,10 +41,12 @@
         echo "</tr>";
 
 
-        for ($i = 0; $i < count($res); $i++) {
+        for ($i = 0; $i < count($row_arr); $i++) {
             $row = $row_arr[$i];
+            echo "<tr>";
             echo "<td>{$row['book_id']}</td><td>{$row['book_name']}</td><td>{$row['book_desc']}</td><td>{$row['detail']}</td><td>{$row['author']}</td>";
             echo "<td>{$row['pic_url']}</td><td>{$row['video_url']}</td>";
+            echo "</tr>";
         }
         echo "</table>";
         ?>

@@ -6,29 +6,13 @@
     </head>
     <body>
         <?php
+        require_once 'MemoryManagerDb.class.php';
         //数据库中获取数据
-        $dbname = 'memorymanager';
-        $tablename = 'table_book';
-        $host = 'localhost:3306';
-        $username = 'root';
-        $password = '1990610';
+        $memory_manager_db = new MemoryManagerDb();
 
-        $conn = mysql_connect($host, $username, $password) or die("mysql_connect error:" . mysql_errno());
-        mysql_select_db($dbname, $conn) or die("mysql_select_db error:" . mysql_errno());
-
+        $tablename = "table_book";
         $sql = "select book_id, book_name, book_desc, detail, author, pic_url, video_url from $tablename ";
-        $res = mysql_query($sql, $conn) or die("execute_dql_get_array {$sql} error:" . mysql_error());
-        //$res=>$arr
-        $row_arr = array();
-        $i = 0;
-        while ($row = mysql_fetch_assoc($res)) {
-            $row_arr[$i++] = $row;
-        }
-        //释放资源
-        mysql_free_result($res);
-        if (!empty($conn)) {
-            mysql_close($conn);
-        }
+        $row_arr = $memory_manager_db->execute_dql_get_assoc_array($sql);
 
 
 

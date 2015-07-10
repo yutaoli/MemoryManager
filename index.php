@@ -6,13 +6,24 @@
     </head>
     <body>
         <?php
-        require_once 'MemoryManagerDb.class.php';
-        //数据库中获取数据
-        $memory_manager_db = new MemoryManagerDb();
+        require_once "TableBase.class.php";
+        require_once 'BookService.class.php';
+        //数据库表中获取数据
+        $bookService = new BookService();
 
-        $tablename = "table_book";
-        $sql = "select book_id, book_name, book_desc, detail, author, pic_url, video_url from $tablename ";
-        $row_arr = $memory_manager_db->execute_dql_get_assoc_array($sql);
+        $fenyePageReq = new FenyePageReq();
+        $fenyePageReq->displayPageCount = 10;
+        $fenyePageReq->goUrl = 'index.php';
+        if (!empty($_GET['nowPage'])) {
+            $fenyePageReq->nowPage = $_GET['nowPage'];
+        } else {
+            $fenyePageReq->nowPage = 1;
+        }
+        $fenyePageReq->perPage = 10;
+
+        $fenyePageRsp = new FenyePageRsp();
+        $bookService->getFenyePage($fenyePageReq, $fenyePageRsp);
+        $row_arr = $fenyePageRsp->res;
 
 
 
@@ -33,6 +44,9 @@
             echo "</tr>";
         }
         echo "</table>";
+
+        //输出导航栏
+        echo $fenyePageRsp->navigator;
         ?>
     </body>
 </html>

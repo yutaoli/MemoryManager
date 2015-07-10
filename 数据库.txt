@@ -71,3 +71,7 @@ version) values("steve jobs", "The phenomenal bestseller about Apple co-founder
 Steve Jobs .", "Walter Isaacson", "http://image.baidu.com/search/det", "http://w
 ww.iqiyi.com/w_19rr9khrpt.html", 1);
 
+/*
+让“书”表自我复制，方便插入大量数据
+*/
+insert into table_book(book_name) select book_name from table_book;

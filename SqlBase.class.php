@@ -12,7 +12,7 @@
  * DQL：对表数据进行读操作，如select
  * DDL：对表结构进行操作，如create, alter, drop
  * DCL：对表进行授权，如grant,deny,revoke
- * @author Administrator
+ * @author yutaoli <yutaoli@athena.com>
  */
 class SqlBase {
 
@@ -87,6 +87,25 @@ class SqlBase {
         $array = array();
         $i = 0;
         while ($row = mysql_fetch_assoc($res)) {
+            $array[$i++] = $row;
+        }
+
+        //释放mysql结果集占用的内存
+        mysql_free_result($res);
+        return $array;
+    }
+
+    /**
+     * DQL：对表数据进行读操作，如select
+     * @param type $sql
+     * @return array , array：表中多行，以row array的形式返回
+     */
+    public function execute_dql_get_row_array($sql) {
+        $res = mysql_query($sql, $this->conn) or die("mysql_query error, sql[{$sql}], errno:" . mysql_errno());
+
+        $array = array();
+        $i = 0;
+        while ($row = mysql_fetch_row($res)) {
             $array[$i++] = $row;
         }
 

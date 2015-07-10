@@ -8,7 +8,7 @@
 /**
  * Description of MemoryManagerDb
  *
- * @author Administrator
+ * @author yutaoli <yutaoli@athena.com>
  */
 require_once 'SqlBase.class.php';
 

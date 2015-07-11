@@ -27,7 +27,7 @@ class BookService extends TableServiceBase {
     }
 
     public function getFenyePage(FenyePageReq $fenyePageReq, FenyePageRsp $fenyePageRsp) {
-        //Check Valid 
+//Check Valid 
         $sql1 = "select count(*) from {$this->tableName}";
         $res1 = $this->memoryManagerDb->execute_dql_get_row_array($sql1);
         if (empty($res1)) {
@@ -50,23 +50,23 @@ class BookService extends TableServiceBase {
 
 
 
-        //Get Req
+//Get Req
         $startPos = ($fenyePageReq->nowPage - 1) * $fenyePageReq->perPage;
         $num = $fenyePageReq->perPage;
 
         $sql2 = "select  * from {$this->tableName} limit {$startPos}, {$num}";
         $res2 = $this->memoryManagerDb->execute_dql_get_assoc_array($sql2);
-        //第一页下标是1
+//第一页下标是1
 
 
         $navigator = "";
-        //上一页
+//上一页
         if ($fenyePageReq->nowPage != 1) {
             $nowPage = $fenyePageReq->nowPage - 1;
             $navigator .="  <a href='{$fenyePageReq->goUrl}?nowPage={$nowPage}&perPage={$fenyePageReq->perPage}&displayPageCount={$fenyePageReq->displayPageCount}'>上一页</a>";
         }
 
-        //$startPage 到 $endPage
+//$startPage 到 $endPage
         $middleNPage = floor($fenyePageReq->displayPageCount / 2) + 1;
         $startPage = 1 + $fenyePageReq->nowPage - $middleNPage;
         $endPage = $fenyePageReq->nowPage + $fenyePageReq->displayPageCount - $middleNPage;
@@ -82,21 +82,21 @@ class BookService extends TableServiceBase {
             $navigator .="  <a href='{$fenyePageReq->goUrl}?nowPage={$i}&perPage={$fenyePageReq->perPage}&displayPageCount={$fenyePageReq->displayPageCount}'>{$i}</a>";
         }
 
-        //下一页
+//下一页
         if ($fenyePageReq->nowPage != $totalPage) {
             $nowPage = $fenyePageReq->nowPage + 1;
             $navigator .="  <a href='{$fenyePageReq->goUrl}?nowPage={$nowPage}&perPage={$fenyePageReq->perPage}&displayPageCount={$fenyePageReq->displayPageCount}'>下一页</a>";
         }
         $navigator .="  当前第{$fenyePageReq->nowPage}页, 共{$totalPage}页</a>";
 
-        //指定跳转到第几页
+//指定跳转到第几页
         $navigator .= "<br/>";
         $navigator .= "<form action='{$fenyePageReq->goUrl}' method='get'>";
         $navigator .= "跳转到：<input type='text' name='nowPage'/>";
         $navigator .= "<input type='submit' value='GO'/>";
         $navigator .= "</form>";
 
-        //Set Rsp
+//Set Rsp
         $fenyePageRsp->res = $res2;
         $fenyePageRsp->totalPage = $totalPage;
         $fenyePageRsp->navigator = $navigator;

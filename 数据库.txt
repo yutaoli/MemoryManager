@@ -75,3 +75,19 @@ ww.iqiyi.com/w_19rr9khrpt.html", 1);
 让“书”表自我复制，方便插入大量数据
 */
 insert into table_book(book_name) select book_name from table_book;
+
+
+
+/*
+“用户”表，插入数据
+*/
+insert into table_user(name, passwd, sexual, age) values('yutaoli', 'admin', 1, 25);
+insert into table_user(name, passwd, sexual, age) values('Mia', 'admin', 1, 24);
+
+/*
+“复习”表，插入数据
+*/
+alter table table_book_review modify last_review int unsigned not null;
+alter table table_book_review modify times_reviewed int unsigned not null default 0;
+
+insert into table_book_review(user_id, book_id, last_review) value(1, 1, 1436625949);

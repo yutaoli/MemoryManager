@@ -32,9 +32,9 @@ class SqlBase {
         $this->dbname = $dbname;
 
         echo "$this->host";
-        $this->conn = mysql_connect($this->host, $this->user, $this->passwd) or die("mysql_connect error:" . mysql_errno());
+        $this->conn = mysql_connect($this->host, $this->user, $this->passwd) or die("mysql_connect errno:" . mysql_errno() . ", error: " . mysql . error());
 
-        mysql_select_db($this->dbname, $this->conn) or die("cannot use db[ {$this->dbname}]" . mysql_errno());
+        mysql_select_db($this->dbname, $this->conn) or die("cannot use db[ {$this->dbname}], errno:" . mysql_errno() . ", error:" . mysql . error());
     }
 
     /**
@@ -50,7 +50,7 @@ class SqlBase {
      * @return int ，-1：失败，0：写入数据成功，1：写入数据成功，没有行受到影响
      */
     public function execute_dml($sql) {
-        $ret = mysql_query($sql, $this->conn) or die("mysql_query error, sql[{$sql}], errno:" . mysql_errno());
+        $ret = mysql_query($sql, $this->conn) or die("mysql_query error, sql[{$sql}], errno:" . mysql_errno() . ", error:" . mysql_error());
 
         if (false == $ret) {
             //执行失败
@@ -72,7 +72,7 @@ class SqlBase {
      * @return type，数据表，需要用mysql_fetch_assoc()取出
      */
     public function execute_dql($sql) {
-        $res = mysql_query($sql, $this->conn) or die("mysql_query error, sql[{$sql}], errno:" . mysql_errno());
+        $res = mysql_query($sql, $this->conn) or die("mysql_query error, sql[{$sql}], errno:" . mysql_errno() . ", error:" . mysql_error());
         return $res;
     }
 
@@ -82,7 +82,7 @@ class SqlBase {
      * @return array，array：表中多行，以assoc array的形式返回
      */
     public function execute_dql_get_assoc_array($sql) {
-        $res = mysql_query($sql, $this->conn) or die("mysql_query error, sql[{$sql}], errno:" . mysql_errno());
+        $res = mysql_query($sql, $this->conn) or die("mysql_query error, sql[{$sql}], errno:" . mysql_errno() . ", error:" . mysql_error());
 
         $array = array();
         $i = 0;
@@ -101,7 +101,7 @@ class SqlBase {
      * @return array , array：表中多行，以row array的形式返回
      */
     public function execute_dql_get_row_array($sql) {
-        $res = mysql_query($sql, $this->conn) or die("mysql_query error, sql[{$sql}], errno:" . mysql_errno());
+        $res = mysql_query($sql, $this->conn) or die("mysql_query error, sql[{$sql}], errno:" . mysql_errno() . ", error:" . mysql_error());
 
         $array = array();
         $i = 0;

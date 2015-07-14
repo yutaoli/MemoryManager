@@ -91,3 +91,4 @@ alter table table_book_review modify last_review int unsigned not null;
 alter table table_book_review modify times_reviewed int unsigned not null default 0;
 
 insert into table_book_review(user_id, book_id, last_review) value(1, 1, 1436625949);
+insert into table_book_review(user_id, book_id, last_review) value(1, 2, 1436625980);

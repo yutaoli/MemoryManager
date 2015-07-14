@@ -12,6 +12,7 @@
  */
 require_once "TableServiceBase.class.php";
 require_once "MemoryManagerDb.class.php";
+require_once 'Book.class.php';
 
 class BookService extends TableServiceBase {
 
@@ -24,6 +25,40 @@ class BookService extends TableServiceBase {
         parent::__construct();
         $this->tableName = "table_book";
         $this->memoryManagerDb = new MemoryManagerDb();
+    }
+
+    public function addBook($bookname, $bookdesc, $detail, $author, $picurl, $videourl) {
+        $sql = "insert into  {$this->tableName}(book_name, book_desc, detail, author, pic_url, video_url) values('$bookname', '$bookdesc', '$detail', '$author', '$picurl', $videourl)";
+        $res = $this->memoryManagerDb->execute_dml($sql);
+        return $res;
+    }
+
+    public function delBook($id) {
+        $sql = "delete from {$this->tableName} where book_id = {$id}";
+        $res = $this->memoryManagerDb->execute_dml($sql);
+        return $res;
+    }
+
+    public function modifyBook($bookid, $bookname, $bookdesc, $detail, $author, $picurl, $videourl) {
+        $sql = "update {$this->tableName} set book_name='{$bookname}', book_desc = '{$bookdesc}', detail ='{$detail}', author='{$author}', pic_url='{$picurl}', video_url='{$videourl}' where book_id = {$bookid}";
+        $res = $this->memoryManagerDb->execute_dml($sql);
+        return $res;
+    }
+
+    public function getBookById($id) {
+        $sql = "select * from $this->tableName where book_id = $id";
+        $res = $this->memoryManagerDb->execute_dql_get_assoc_array($sql);
+
+        $book = new Book();
+        $book->setAuthor($res[0]['author']);
+        $book->setBookDesc($res[0]['book_desc']);
+        $book->setBookId($res[0]['book_id']);
+        $book->setBookName($res[0]['book_name']);
+        $book->setDetail($res[0]['detail']);
+        $book->setPic_url($res[0]['pic_url']);
+        $book->setVersion($res[0]['version']);
+        $book->getVideo_url($res[0]['video_url']);
+        return $book;
     }
 
     public function getFenyePage(FenyePageReq $fenyePageReq, FenyePageRsp $fenyePageRsp) {
@@ -87,7 +122,7 @@ class BookService extends TableServiceBase {
             $nowPage = $fenyePageReq->nowPage + 1;
             $navigator .="  <a href='{$fenyePageReq->goUrl}?nowPage={$nowPage}&perPage={$fenyePageReq->perPage}&displayPageCount={$fenyePageReq->displayPageCount}'>下一页</a>";
         }
-        $navigator .="  当前第{$fenyePageReq->nowPage}页, 共{$totalPage}页</a>";
+        $navigator .="  当前第{$fenyePageReq->nowPage}页, 共{$totalPage}页";
 
 //指定跳转到第几页
         $navigator .= "<br/>";

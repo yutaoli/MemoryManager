@@ -27,7 +27,7 @@ and open the template in the editor.
 
         $fenyePageReq = new FenyePageReq();
         $fenyePageReq->displayPageCount = 10;
-        $fenyePageReq->goUrl = 'book_list.php';
+        $fenyePageReq->goUrl = 'list_book.php';
         if (!empty($_GET['nowPage'])) {
             $fenyePageReq->nowPage = $_GET['nowPage'];
         } else {

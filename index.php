@@ -7,7 +7,7 @@
 
     <body>
         <?php
-        header("location: book_list.php");
+        header("location: list_book.php");
 
         exit();
         ?>

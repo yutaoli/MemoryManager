@@ -38,6 +38,10 @@ alter table table_book_review add foreign key(user_id) references table_u
 ser(user_id);
 alter table table_book_review add foreign key(book_id) references table_b
 ook(book_id);
+/*
+修改列属性
+*/
+alter table table_book_review modify last_review int unsigned not null;
 
 /*
 建“书”表
@@ -92,3 +96,5 @@ alter table table_book_review modify times_reviewed int unsigned not null defaul
 
 insert into table_book_review(user_id, book_id, last_review) value(1, 1, 1436625949);
 insert into table_book_review(user_id, book_id, last_review) value(1, 2, 1436625980);
+insert into  table_book_review(user_id, book_id, last_review) values(3, 1
+, 1436625999);

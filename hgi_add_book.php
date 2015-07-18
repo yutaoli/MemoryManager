@@ -9,19 +9,19 @@ require_once 'BookService.class.php';
 $bookService = new BookService();
 
 //Check Valid
-if (empty($_POST["bookname"])) {
+if (!isset($_POST["bookname"])) {
     echo "参数错误：bookname为空";
     exit();
 }
-if (empty($_POST["bookdesc"])) {
+if (!isset($_POST["bookdesc"])) {
     echo "参数错误：bookdesc为空";
     exit();
 }
-if (empty($_POST["detail"])) {
+if (!isset($_POST["detail"])) {
     echo "参数错误：detail为空";
     exit();
 }
-if (empty($_POST["author"])) {
+if (!isset($_POST["author"])) {
     echo "参数错误：author为空";
     exit();
 }

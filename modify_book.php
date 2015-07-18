@@ -15,7 +15,7 @@ and open the template in the editor.
         require_once 'Book.class.php';
 
         //Check Valid
-        if (empty($_GET['book_id'])) {
+        if (!isset($_GET['book_id'])) {
             echo "²ÎÊý´íÎó£ºbook_idÎª¿Õ";
             exit();
         }

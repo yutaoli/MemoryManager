@@ -131,7 +131,7 @@ class SqlBase {
     }
 
     public function close_connect() {
-        if (!empty($this->conn)) {
+        if (!!isset($this->conn)) {
             mysql_close($this->conn);
         }
     }

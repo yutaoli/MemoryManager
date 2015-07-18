@@ -7,7 +7,7 @@
 require_once 'BookService.class.php';
 
 //Check Valid
-if (empty($_GET['bookid'])) {
+if (!isset($_GET['bookid'])) {
     echo "²ÎÊý´íÎó£ºbookidÎª¿Õ";
     exit();
 }
@@ -15,8 +15,8 @@ if (empty($_GET['bookid'])) {
 
 $bookService = new BookService();
 $bookid = $_GET['bookid'];
-$res = $bookService->delBook($bookid);
-if ((0 == $res) || (1 == $res)) {
+$ret = $bookService->delBook($bookid);
+if ((0 == $ret) || (1 == $ret)) {
     header("location: ok.php");
     exit();
 }

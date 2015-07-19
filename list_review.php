@@ -47,7 +47,12 @@ and open the template in the editor.
             $a_left_days_next_review = $review_cycle_array[$a['times_reviewed']] - ceil(($time_stamp_now - $a['last_review']) / 86400);
             $b_left_days_next_review = $review_cycle_array[$b['times_reviewed']] - ceil(($time_stamp_now - $b['last_review']) / 86400);
             if ($a_left_days_next_review == $b_left_days_next_review) {
-                return 0;
+
+                if ($a['last_review'] == $b['last_review']) {
+                    return 0;
+                } else {
+                    return $a['last_review'] < $b['last_review'] ? -1 : 1;
+                }
             }
 
             return $a_left_days_next_review < $b_left_days_next_review ? -1 : 1;

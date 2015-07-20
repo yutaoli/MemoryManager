@@ -43,9 +43,11 @@ and open the template in the editor.
         function review_cmp($a, $b) {
             global $review_cycle_array;
 
+            //以半天为单位，给人紧迫感，所以现在距离复习的时间要精确到半天，如过去了1.2天，就认为是1天；过去了1.5天，就认为是1.5天；过去了1.6天，就认为是1.5天；过去了2天，就是2天。
+            //即f(1.2)=1, f(1.5)=1.5, f(1.6)=1.5, f(2)=2，于是f(x)=floor(2*x)/2;
             $time_stamp_now = time();
-            $a_left_days_next_review = $review_cycle_array[$a['times_reviewed']] - ceil(($time_stamp_now - $a['last_review']) / 86400);
-            $b_left_days_next_review = $review_cycle_array[$b['times_reviewed']] - ceil(($time_stamp_now - $b['last_review']) / 86400);
+            $a_left_days_next_review = $review_cycle_array[$a['times_reviewed']] - floor(2 * ($time_stamp_now - $a['last_review']) / 86400) / 2;
+            $b_left_days_next_review = $review_cycle_array[$b['times_reviewed']] - floor(2 * ($time_stamp_now - $b['last_review']) / 86400) / 2;
             if ($a_left_days_next_review == $b_left_days_next_review) {
 
                 if ($a['last_review'] == $b['last_review']) {
@@ -85,9 +87,11 @@ and open the template in the editor.
             $num = ($fenyePageReq->nowPage - 1) * $fenyePageReq->perPage + $i + 1;
             $row = $row_arr[$i];
             $date_last_review = date('Y-m-d H:i:s', $row['last_review']);
-            $left_days_next_review = $review_cycle_array[$row['times_reviewed']] - ceil(($time_stamp_now - $row['last_review']) / 86400);
+            //以半天为单位，给人紧迫感，所以现在距离复习的时间要精确到半天，如过去了1.2天，就认为是1天；过去了1.5天，就认为是1.5天；过去了1.6天，就认为是1.5天；过去了2天，就是2天。
+            //即f(1.2)=1, f(1.5)=1.5, f(1.6)=1.5, f(2)=2，于是f(x)=floor(2*x)/2;
+            $left_days_next_review = $review_cycle_array[$row['times_reviewed']] - floor(2 * ($time_stamp_now - $row['last_review']) / 86400) / 2;
             echo "<tr>";
-            if ($left_days_next_review >= 0) {
+            if ($left_days_next_review > 0) {
                 echo "<td>{$num}</td><td>{$row['user_id']}</td><td>{$row['book_id']}</td><td>{$row['book_name']}</td><td>{$left_days_next_review}</td><td>{$date_last_review}</td>";
             } else {//复习截止时间到了
                 echo "<td>{$num}</td><td>{$row['user_id']}</td><td>{$row['book_id']}</td><td>{$row['book_name']}</td><td><font color='#FF0000' size=5>{$left_days_next_review}</font></td><td>{$date_last_review}</td>";

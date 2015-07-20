@@ -25,7 +25,7 @@ class BookService extends TableServiceBase {
     }
 
     public function addBook($bookname, $bookdesc, $detail, $author, $picurl, $videourl) {
-        $sql = "insert into  {$this->tableName}(book_name, book_desc, detail, author, pic_url, video_url) values('$bookname', '$bookdesc', '$detail', '$author', '$picurl', $videourl)";
+        $sql = "insert into  {$this->tableName}(book_name, book_desc, detail, author, pic_url, video_url) values('$bookname', '$bookdesc', '$detail', '$author', '$picurl', '$videourl')";
         $res = $this->dbName->execute_dml($sql);
         return $res;
     }

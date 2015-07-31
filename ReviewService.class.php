@@ -17,7 +17,27 @@ require_once 'Review.class.php';
 class ReviewService extends TableServiceBase {
 
     //put your code here
+    //复习循环周期，如第一次复习是第二天，即间隔一天，第二次复习是第一次复习的7天后，如此类推。。
+    public static $review_cycle_array = array(1, 7, 15, 30, 60, 150, 300);
 
+    private function review_cmp($a, $b) {
+
+        //以半天为单位，给人紧迫感，所以现在距离复习的时间要精确到半天，如过去了1.2天，就认为是1天；过去了1.5天，就认为是1.5天；过去了1.6天，就认为是1.5天；过去了2天，就是2天。
+        //即f(1.2)=1, f(1.5)=1.5, f(1.6)=1.5, f(2)=2，于是f(x)=floor(2*x)/2;
+        $time_stamp_now = time();
+        $a_left_days_next_review = ReviewService::$review_cycle_array[$a['times_reviewed']] - floor(2 * ($time_stamp_now - $a['last_review']) / 86400) / 2;
+        $b_left_days_next_review = ReviewService::$review_cycle_array[$b['times_reviewed']] - floor(2 * ($time_stamp_now - $b['last_review']) / 86400) / 2;
+        if ($a_left_days_next_review == $b_left_days_next_review) {
+
+            if ($a['last_review'] == $b['last_review']) {
+                return 0;
+            } else {
+                return $a['last_review'] < $b['last_review'] ? -1 : 1;
+            }
+        }
+
+        return $a_left_days_next_review < $b_left_days_next_review ? -1 : 1;
+    }
 
     public function __construct() {
         parent::__construct();
@@ -90,14 +110,14 @@ class ReviewService extends TableServiceBase {
      */
     public function getReviewFenyePage(ReviewFenyePageReq $fenyePageReq, ReviewFenyePageRsp $fenyePageRsp) {
         //Check Valid 
-        $sql1 = "select count(*) from {$this->tableName} where user_id = {$fenyePageReq->user_id}";
-        $res1 = $this->dbName->execute_dql_get_row_array($sql1);
-        if (!isset($res1)) {
+        $sql = "select count(*) from {$this->tableName} where user_id = {$fenyePageReq->user_id}";
+        $res = $this->dbName->execute_dql_get_row_array($sql);
+        if (!isset($res)) {
             //没有数据
             return;
         }
 
-        $totalRecord = $res1[0][0];
+        $totalRecord = $res[0][0];
         $totalPage = ceil($totalRecord / $fenyePageReq->perPage);
         echo "totalpage[{$totalPage}], totalRecord[{$totalRecord}], num[{$fenyePageReq->perPage}]";
 
@@ -114,16 +134,23 @@ class ReviewService extends TableServiceBase {
 
 
         //Get Req
-        $startPos = ($fenyePageReq->nowPage - 1) * $fenyePageReq->perPage;
-        $num = $fenyePageReq->perPage;
-
-        $sql2 = "select user_id, A.book_id, last_review, times_reviewed, left_days_next_review, note, book_desc, book_name, detail, author, pic_url, video_url from " .
-                "(select  * from {$this->tableName} where user_id = {$fenyePageReq->user_id} limit {$startPos}, {$num}) A,  table_book B " .
+        $sql_arr = "select user_id, A.book_id, last_review, times_reviewed, left_days_next_review, note, book_desc, book_name, detail, author, pic_url, video_url from " .
+                "(select  * from {$this->tableName} where user_id = {$fenyePageReq->user_id} ) A,  table_book B " .
                 "where A.book_id = B.book_id";
-        $res2 = $this->dbName->execute_dql_get_assoc_array($sql2);
+        $res_arr = $this->dbName->execute_dql_get_assoc_array($sql_arr);
+
+        //按距离下次复习时间升序排列
+        usort($res_arr, array('ReviewService', 'review_cmp'));
+
+        //选出start, num的记录
+        $row_arr = array();
+        $startPos = ($fenyePageReq->nowPage - 1) * $fenyePageReq->perPage;
+        $num = min($totalRecord - $startPos, $fenyePageReq->perPage);
+        for ($i = 0; $i < $num; $i++) {
+            $row_arr[$i] = $res_arr[$startPos + $i];
+        }
+
         //第一页下标是1
-
-
         $navigator = "";
         //上一页
         if ($fenyePageReq->nowPage != 1) {
@@ -166,7 +193,7 @@ class ReviewService extends TableServiceBase {
         $navigator .= "</form>";
 
         //Set Rsp
-        $fenyePageRsp->res = $res2;
+        $fenyePageRsp->res = $row_arr;
         $fenyePageRsp->totalPage = $totalPage;
         $fenyePageRsp->navigator = $navigator;
     }

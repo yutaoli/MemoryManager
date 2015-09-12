@@ -108,36 +108,33 @@ class ReviewService extends TableServiceBase {
     /**
      * 获取数据库分页数据
      */
-    public function getReviewFenyePage(ReviewFenyePageReq $fenyePageReq, ReviewFenyePageRsp $fenyePageRsp) {
-        //Check Valid 
-        $sql = "select count(*) from {$this->tableName} where user_id = {$fenyePageReq->user_id}";
-        $res = $this->dbName->execute_dql_get_row_array($sql);
-        if (!isset($res)) {
-            //没有数据
+    public function listReviewFenyePage(ListReviewFenyePageReq $fenyePageReq, ListReviewFenyePageRsp $fenyePageRsp) {
+
+        //Get Req
+        $sql_arr = "select user_id, A.book_id, last_review, times_reviewed, left_days_next_review, note, book_desc, book_name, detail, author, pic_url, video_url from " .
+                "(select  * from {$this->tableName} where user_id = {$fenyePageReq->user_id} ) A,  table_book B " .
+                "where A.book_id = B.book_id";
+
+        $res_arr = $this->dbName->execute_dql_get_assoc_array($sql_arr);
+        $totalRecord = count($res_arr);
+        if ($totalRecord == 0) {
             return;
         }
 
-        $totalRecord = $res[0][0];
+        //Check Valid 
+        if ($fenyePageReq->perPage < 1 || $fenyePageReq->perPage > 100) {
+            $fenyePageReq->perPage = 100;
+        }
         $totalPage = ceil($totalRecord / $fenyePageReq->perPage);
-        echo "totalpage[{$totalPage}], totalRecord[{$totalRecord}], num[{$fenyePageReq->perPage}]";
-
         if ($fenyePageReq->nowPage < 1 || $fenyePageReq->nowPage > $totalPage) {
             $fenyePageReq->nowPage = 1;
         }
         if ($fenyePageReq->displayPageCount < 1 || $fenyePageReq->displayPageCount > 10) {
             $fenyePageReq->displayPageCount = 10;
         }
-        if ($fenyePageReq->perPage < 1 || $fenyePageReq->perPage > 100) {
-            $fenyePageReq->perPage = 100;
-        }
 
+        echo "totalpage[{$totalPage}], totalRecord[{$totalRecord}], num[{$fenyePageReq->perPage}]";
 
-
-        //Get Req
-        $sql_arr = "select user_id, A.book_id, last_review, times_reviewed, left_days_next_review, note, book_desc, book_name, detail, author, pic_url, video_url from " .
-                "(select  * from {$this->tableName} where user_id = {$fenyePageReq->user_id} ) A,  table_book B " .
-                "where A.book_id = B.book_id";
-        $res_arr = $this->dbName->execute_dql_get_assoc_array($sql_arr);
 
         //按距离下次复习时间升序排列
         usort($res_arr, array('ReviewService', 'review_cmp'));
@@ -159,15 +156,30 @@ class ReviewService extends TableServiceBase {
         }
 
         //$startPage 到 $endPage
-        $middleNPage = floor($fenyePageReq->displayPageCount / 2) + 1;
-        $startPage = 1 + $fenyePageReq->nowPage - $middleNPage;
-        $endPage = $fenyePageReq->nowPage + $fenyePageReq->displayPageCount - $middleNPage;
-        if ($startPage >= 1) {
-            $endPage = min($endPage, $totalPage);
-            $startPage = min($startPage, 1 + $totalPage - $fenyePageReq->displayPageCount);
+        if ($totalPage == 0) {
+            $startPage = 0;
+            $endPage = -1;
         } else {
-            $endPage = min($fenyePageReq->displayPageCount, $totalPage);
-            $startPage = 1;
+            $middleNPage = floor($fenyePageReq->displayPageCount / 2) + 1;
+            $startPage = 1 + $fenyePageReq->nowPage - $middleNPage;
+            $endPage = $fenyePageReq->nowPage + $fenyePageReq->displayPageCount - $middleNPage;
+            //以$startPage与1，$endPage与$totalPage的大小关系分4类讨论
+            if ($startPage < 1) {
+                if ($endPage < $totalPage) {
+                    $startPage = 1;
+                    $endPage = min($totalPage, $fenyePageReq->displayPageCount);
+                } else {
+                    $startPage = 1;
+                    $endPage = $totalPage;
+                }
+            } else {
+                if ($endPage < $totalPage) {
+                    
+                } else {
+                    $endPage = $totalPage;
+                    $startPage = max(1, 1 + $endPage - $fenyePageReq->displayPageCount);
+                }
+            }
         }
 
         for ($i = $startPage; $i <= $endPage; $i++) {
@@ -179,7 +191,7 @@ class ReviewService extends TableServiceBase {
         }
 
         //下一页
-        if ($fenyePageReq->nowPage != $totalPage) {
+        if ($fenyePageReq->nowPage < $totalPage) {
             $nowPage = $fenyePageReq->nowPage + 1;
             $navigator .="  <a href='{$fenyePageReq->goUrl}?nowPage={$nowPage}&perPage={$fenyePageReq->perPage}&displayPageCount={$fenyePageReq->displayPageCount}'>下一页</a>";
         }
@@ -189,6 +201,8 @@ class ReviewService extends TableServiceBase {
         $navigator .= "<br/>";
         $navigator .= "<form action='{$fenyePageReq->goUrl}' method='get'>";
         $navigator .= "跳转到：<input type='text' name='nowPage'/>";
+        $navigator.="<input type='hidden' name='perPage' value='{$fenyePageReq->perPage}' />";
+        $navigator.="<input type = 'hidden' name='displayPageCount' value='{$fenyePageReq->displayPageCount}' />";
         $navigator .= "<input type='submit' value='GO'/>";
         $navigator .= "</form>";
 
@@ -196,6 +210,122 @@ class ReviewService extends TableServiceBase {
         $fenyePageRsp->res = $row_arr;
         $fenyePageRsp->totalPage = $totalPage;
         $fenyePageRsp->navigator = $navigator;
+    }
+
+    /**
+     * 关键词搜索获取数据库分页数据
+     */
+    public function searchReviewFenyePage(SearchReviewFenyePageReq $fenyePageReq, SearchReviewFenyePageRsp $fenyePageRsp) {
+
+        //Get Req
+        //review列表中搜索"book_name"
+        $sql_arr = "select user_id, A.book_id, last_review, times_reviewed, left_days_next_review, note, book_desc, book_name, detail, author, pic_url, video_url from " .
+                "(select * from {$this->tableName} where user_id = {$fenyePageReq->user_id})A, (select * from table_book where book_name like  binary '%{$fenyePageReq->keyWord}%')B " .
+                "where A.book_id = B.book_id";
+
+        $res_arr = $this->dbName->execute_dql_get_assoc_array($sql_arr);
+        $totalRecord = count($res_arr);
+        if ($totalRecord == 0) {
+            return;
+        }
+
+        //Check Valid 
+        if ($fenyePageReq->perPage < 1 || $fenyePageReq->perPage > 100) {
+            $fenyePageReq->perPage = 100;
+        }
+        $totalPage = ceil($totalRecord / $fenyePageReq->perPage);
+        if ($fenyePageReq->nowPage < 1 || $fenyePageReq->nowPage > $totalPage) {
+            $fenyePageReq->nowPage = 1;
+        }
+        if ($fenyePageReq->displayPageCount < 1 || $fenyePageReq->displayPageCount > 10) {
+            $fenyePageReq->displayPageCount = 10;
+        }
+
+        echo "totalpage[{$totalPage}], totalRecord[{$totalRecord}], num[{$fenyePageReq->perPage}]";
+
+
+        //按距离下次复习时间升序排列
+        usort($res_arr, array('ReviewService', 'review_cmp'));
+
+        //选出start, num的记录
+        $row_arr = array();
+        $startPos = ($fenyePageReq->nowPage - 1) * $fenyePageReq->perPage;
+        $num = min($totalRecord - $startPos, $fenyePageReq->perPage);
+        for ($i = 0; $i < $num; $i++) {
+            $row_arr[$i] = $res_arr[$startPos + $i];
+        }
+
+        //第一页下标是1
+        $navigator = "";
+        //上一页
+        if ($fenyePageReq->nowPage != 1) {
+            $nowPage = $fenyePageReq->nowPage - 1;
+            $navigator .="  <a href='{$fenyePageReq->goUrl}?nowPage={$nowPage}&perPage={$fenyePageReq->perPage}&displayPageCount={$fenyePageReq->displayPageCount}&keyWord={$fenyePageReq->keyWord}'>上一页</a>";
+        }
+
+        //$startPage 到 $endPage
+        if ($totalPage == 0) {
+            $startPage = 0;
+            $endPage = -1;
+        } else {
+            $middleNPage = floor($fenyePageReq->displayPageCount / 2) + 1;
+            $startPage = 1 + $fenyePageReq->nowPage - $middleNPage;
+            $endPage = $fenyePageReq->nowPage + $fenyePageReq->displayPageCount - $middleNPage;
+            //以$startPage与1，$endPage与$totalPage的大小关系分4类讨论
+            if ($startPage < 1) {
+                if ($endPage < $totalPage) {
+                    $startPage = 1;
+                    $endPage = min($totalPage, $fenyePageReq->displayPageCount);
+                } else {
+                    $startPage = 1;
+                    $endPage = $totalPage;
+                }
+            } else {
+                if ($endPage < $totalPage) {
+                    
+                } else {
+                    $endPage = $totalPage;
+                    $startPage = max(1, 1 + $endPage - $fenyePageReq->displayPageCount);
+                }
+            }
+        }
+
+        for ($i = $startPage; $i <= $endPage; $i++) {
+            if ($i != $fenyePageReq->nowPage) {
+                $navigator .="  <a href='{$fenyePageReq->goUrl}?nowPage={$i}&perPage={$fenyePageReq->perPage}&displayPageCount={$fenyePageReq->displayPageCount}&keyWord={$fenyePageReq->keyWord}'>{$i}</a>";
+            } else {
+                $navigator .="  {$i}";
+            }
+        }
+
+        //下一页
+        if ($fenyePageReq->nowPage < $totalPage) {
+            $nowPage = $fenyePageReq->nowPage + 1;
+            $navigator .="  <a href='{$fenyePageReq->goUrl}?nowPage={$nowPage}&perPage={$fenyePageReq->perPage}&displayPageCount={$fenyePageReq->displayPageCount}&keyWord={$fenyePageReq->keyWord}'>下一页</a>";
+        }
+        $navigator .="  当前第{$fenyePageReq->nowPage}页, 共{$totalPage}页";
+
+        //指定跳转到第几页
+        $navigator .= "<br/>";
+        $navigator .= "<form action='{$fenyePageReq->goUrl}' method='get'>";
+        $navigator .= "跳转到：<input type='text' name='nowPage'/>";
+        $navigator.="<input type='hidden' name='perPage' value='{$fenyePageReq->perPage}' />";
+        $navigator.="<input type = 'hidden' name='displayPageCount' value='{$fenyePageReq->displayPageCount}' />";
+        $navigator.="<input type = 'hidden' name='keyWord' value='{$fenyePageReq->keyWord}' />";
+        $navigator .= "<input type='submit' value='GO'/>";
+        $navigator .= "</form>";
+
+        //Set Rsp
+        $fenyePageRsp->res = $row_arr;
+        $fenyePageRsp->totalPage = $totalPage;
+        $fenyePageRsp->navigator = $navigator;
+    }
+
+    /**
+     * 获取分页数据，实现listReviewFenyePage()和searchReviewFenyePage()公共逻辑
+     */
+    public function getFenyePage(FenyePageReq $fenyePageReq, FenyePageRsp $fenyePageRsp) {
+        
     }
 
 }

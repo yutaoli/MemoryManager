@@ -126,13 +126,24 @@ class Review extends TableBase {
 
 }
 
-class ReviewFenyePageReq extends FenyePageReq {
+class ListReviewFenyePageReq extends FenyePageReq {
 
     public $user_id;
 
 }
 
-class ReviewFenyePageRsp extends FenyePageRsp {
+class ListReviewFenyePageRsp extends FenyePageRsp {
+    
+}
+
+class SearchReviewFenyePageReq extends FenyePageReq {
+
+    public $user_id;
+    public $keyWord; //¹Ø¼ü´ÊËÑË÷ÓÃ
+
+}
+
+class SearchReviewFenyePageRsp extends FenyePageRsp {
     
 }
 

@@ -49,18 +49,26 @@ and open the template in the editor.
         //数据库表中获取数据
         $bookService = new BookService();
 
-        $fenyePageReq = new ListBookFenyePageReq();
+        $fenyePageReq = new SearchBookFenyePageReq();
         $fenyePageReq->displayPageCount = 10;
-        $fenyePageReq->goUrl = 'list_book.php';
+        $fenyePageReq->goUrl = 'search_book.php';
         if (!!isset($_GET['nowPage'])) {
             $fenyePageReq->nowPage = $_GET['nowPage'];
         } else {
             $fenyePageReq->nowPage = 1;
         }
         $fenyePageReq->perPage = 10;
+        if (isset($_GET['keyWord']) && $_GET['keyWord'] != "") {
+            $fenyePageReq->keyWord = urldecode($_GET['keyWord']);
+            // echo "keyWord[{$fenyePageReq->keyWord}]";
+        } else {
+            echo "param error, keyWord empty.";
+            exit();
+        }
 
-        $fenyePageRsp = new ListBookFenyePageRsp();
-        $bookService->listBookFenyePage($fenyePageReq, $fenyePageRsp);
+
+        $fenyePageRsp = new SearchBookFenyePageRsp();
+        $bookService->searchBookFenyePage($fenyePageReq, $fenyePageRsp);
         $row_arr = $fenyePageRsp->res;
 
         for ($i = 0; $i < count($row_arr); $i++) {

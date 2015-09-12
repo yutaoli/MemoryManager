@@ -22,6 +22,32 @@ and open the template in the editor.
         // 'Asia/Shanghai' 为上海时区 
         ini_set('date.timezone', 'Asia/Shanghai');
 
+
+        //TODO：增加用户登录逻辑
+        $user_id = 1; //yutaoli
+        //checkinput
+        $reviewService = new ReviewService();
+
+        $fenyePageReq = new SearchReviewFenyePageReq();
+        $fenyePageReq->user_id = $user_id;
+        $fenyePageReq->perPage = 10;
+        if (!!isset($_GET['nowPage'])) {
+            $fenyePageReq->nowPage = $_GET['nowPage'];
+        } else {
+            $fenyePageReq->nowPage = 1;
+        }
+        $fenyePageReq->displayPageCount = 10;
+        $fenyePageReq->goUrl = 'search_review.php';
+        if (isset($_GET['keyWord']) && $_GET['keyWord'] != "") {
+            $fenyePageReq->keyWord = urldecode($_GET['keyWord']);
+           // echo "keyWord[{$fenyePageReq->keyWord}]";
+        } else {
+            echo "param error, keyWord empty.";
+            exit();
+        }
+
+
+        //process
         echo "<h1>复习列表</h1>";
         echo "<hr/>";
 
@@ -42,25 +68,9 @@ and open the template in the editor.
         echo "</tr>";
 
 
-        //TODO：增加用户登录逻辑
-        $user_id = 1; //yutaoli
-        //数据库表中获取数据
-        $reviewService = new ReviewService();
 
-        $fenyePageReq = new ListReviewFenyePageReq();
-        $fenyePageReq->user_id = $user_id;
-        $fenyePageReq->perPage = 10;
-        if (!!isset($_GET['nowPage'])) {
-            $fenyePageReq->nowPage = $_GET['nowPage'];
-        } else {
-            $fenyePageReq->nowPage = 1;
-        }
-        $fenyePageReq->displayPageCount = 10;
-        $fenyePageReq->goUrl = 'list_review.php';
-
-
-        $fenyePageRsp = new ListReviewFenyePageRsp();
-        $reviewService->listReviewFenyePage($fenyePageReq, $fenyePageRsp);
+        $fenyePageRsp = new SearchReviewFenyePageRsp();
+        $reviewService->searchReviewFenyePage($fenyePageReq, $fenyePageRsp);
         $row_arr = $fenyePageRsp->res;
 
 

@@ -135,4 +135,22 @@ class Book extends TableBase {
 
 }
 
+class ListBookFenyePageReq extends FenyePageReq {
+    
+}
+
+class ListBookFenyePageRsp extends FenyePageRsp {
+    
+}
+
+class SearchBookFenyePageReq extends FenyePageReq {
+
+    public $keyWord; //¹Ø¼ü´ÊËÑË÷ÓÃ
+
+}
+
+class SearchBookFenyePageRsp extends FenyePageRsp {
+    
+}
+
 ?>

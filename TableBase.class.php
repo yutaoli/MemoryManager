@@ -17,6 +17,7 @@ class FenyePageReq {
     public $nowPage; //当前展示的是第几页的数据
     public $displayPageCount; //一次展示多少页
     public $goUrl; //点击页跳转url
+  
 
 }
 

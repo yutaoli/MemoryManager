@@ -76,7 +76,7 @@ and open the template in the editor.
 
 
                 //数据展示，每行写5个<th></th>
-                echo "<table border='1px' bordercolor='green' celspacing='0px' width='700px'> ";
+                echo "<table border='1px' bordercolor='green' celspacing='0px' width='1100px'> ";
                 echo "<tr>";
                 echo "<th>编号</th><th>user_id</th><th>book_id</th><th>book_name</th><th>left_days_next_review</th><th>last_review</th>";
                 echo "<th>times_reviewed</th><th>note</th><th>已复习</th><th>删除</th><th>修改</th>";

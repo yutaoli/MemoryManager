@@ -36,7 +36,7 @@ and open the template in the editor.
         echo "<br/><a href='register.php'>注册</a>";
 
         //数据展示，每行写5个<th></th>
-        echo "<table border='1px' bordercolor='green' celspacing='0px' width='700px'> ";
+        echo "<table border='1px' bordercolor='green' celspacing='0px' width='1100px'> ";
         echo "<tr>";
         echo "<th>编号</th><th>bookid</th><th>book_name</th><th>book_desc</th><th>detail</th>";
         echo "<th>author</th><th>pic_url</th><th>video_url</th><th>加入review</th><th>删除</th>";

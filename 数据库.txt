@@ -56,6 +56,11 @@ alter table book modify book_id int unsigned auto_increment;
 alter table book rename to table_book;
 
 /*
+修改列
+*/
+alter table table_book modify book_name varchar(200) not null;
+
+/*
 建“用户”表
 */
 create table table_user(user_id int unsigned primary key auto_increment,
